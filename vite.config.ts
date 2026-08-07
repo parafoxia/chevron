@@ -17,6 +17,10 @@ export default defineConfig(() => ({
     port: 1420,
     strictPort: true,
     host: host || false,
+    // Work around an issue where Tauri's dev server would just show a white window.
+    warmup: {
+      clientFiles: ["./index.html", "./src/main.ts"],
+    },
     hmr: host
       ? {
           protocol: "ws",
