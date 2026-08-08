@@ -1,0 +1,44 @@
+version = 1
+
+# Project files that cannot carry an inline comment, or where one would be
+# noise. All .json goes here: strict JSON has no comment syntax, and reuse
+# treats every .json as uncommentable even where the toolchain reads JSONC.
+[[annotations]]
+path = [
+  ".gitignore",
+  ".vscode/extensions.json",
+  "README.md",
+  "package.json",
+  "tsconfig.json",
+  "tsconfig.node.json",
+  "src-tauri/.gitignore",
+  "src-tauri/capabilities/default.json",
+  "src-tauri/tauri.conf.json",
+]
+SPDX-FileCopyrightText = "2026 Ethan Henderson"
+SPDX-License-Identifier = "MIT OR Apache-2.0"
+
+# Generated lockfiles. 'override' stops reuse reading them at all, which avoids
+# scanning ~1MB of JSON and immunises us against a stray "Copyright" string
+# appearing in dependency metadata later.
+[[annotations]]
+path = ["package-lock.json", "src-tauri/Cargo.lock"]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Ethan Henderson"
+SPDX-License-Identifier = "MIT OR Apache-2.0"
+
+# --- Third-party scaffold assets, retained from create-tauri-app ---
+
+[[annotations]]
+path = "public/vite.svg"
+precedence = "override"
+SPDX-FileCopyrightText = "2019-present VoidZero Inc. and Vite contributors"
+SPDX-License-Identifier = "MIT"
+SPDX-FileComment = "Vite logo. Vendored unmodified from tauri-apps/create-tauri-app, templates/_assets_/vite.svg."
+
+[[annotations]]
+path = "src-tauri/icons/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2019-2024 Tauri Programme within The Commons Conservancy"
+SPDX-License-Identifier = "Apache-2.0 OR MIT"
+SPDX-FileComment = "Default Tauri application icon set. Vendored unmodified from tauri-apps/create-tauri-app, templates/_base_/src-tauri/icons/."
