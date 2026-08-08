@@ -8,6 +8,6 @@
     "opener:default",
     "dialog:default",
     "process:default",
-    "core:window:allow-toggle-maximize"
+    "core:window:allow-maximize"
   ]
 }

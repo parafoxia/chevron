@@ -8,18 +8,15 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 import { computed, onMounted, ref, type Ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { invoke } from "@tauri-apps/api/core";
-import { AgGridVue } from "ag-grid-vue3";
-import { colorSchemeDark, themeQuartz } from "ag-grid-community";
 import { tableFromIPC, DataType } from "apache-arrow";
 import ColumnHeader from "./ColumnHeader.vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
+import DataLoading from "./DataLoading.vue";
+import DataGrid from "./DataGrid.vue";
+
 const route = useRoute();
 const path = computed(() => route.query.path as string);
-
-const darkTheme = themeQuartz
-    .withPart(colorSchemeDark)
-    .withParams({ wrapperBorderRadius: 0 });
 
 const rowData = ref<Record<string, any>[]>([]);
 const colDefs = ref<{ field: string }[]>([]);
@@ -32,8 +29,10 @@ type FieldType = {
 };
 
 let loadToken = 0;
+const isLoading = ref(false);
 
 const loadData = async () => {
+    isLoading.value = true;
     const token = ++loadToken;
     const table = tableFromIPC(
         await invoke<ArrayBuffer>("open_parquet", {
@@ -59,6 +58,7 @@ const loadData = async () => {
             return params.value;
         },
     }));
+    isLoading.value = false;
 };
 
 watch(path, loadData, { immediate: true });
@@ -69,10 +69,6 @@ onMounted(async () => {
 </script>
 
 <template>
-    <AgGridVue
-        :rowData="rowData"
-        :columnDefs="colDefs"
-        class="flex-1 min-h-0"
-        :theme="darkTheme"
-    />
+    <DataLoading v-if="isLoading" />
+    <DataGrid v-else :rowData="rowData" :colDefs="colDefs" />
 </template>
