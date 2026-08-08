@@ -24,6 +24,7 @@ const width = ref(0);
 const selectedCell = ref<CellCoords | null>(null);
 
 let loadToken = 0;
+const loadTokenRef = ref(0);
 const isLoading = ref(false);
 
 const loadData = async () => {
@@ -36,6 +37,7 @@ const loadData = async () => {
     );
     if (token !== loadToken) return;
     table.value = loaded;
+    loadTokenRef.value = token;
 
     selectedCell.value = null;
     height.value = table.value.numCols;
@@ -53,13 +55,14 @@ onMounted(async () => {
     <div class="relative flex flex-1 min-h-0">
         <DataGrid
             v-if="table"
+            :key="loadTokenRef"
             :table="table"
             @cell-focused="selectedCell = $event"
             @first-data-rendered="isLoading = false"
         />
         <DataLoading
             v-if="isLoading"
-            class="absolute inset-0 bg-(--p-content-background)"
+            class="absolute inset-0 bg-(--p-content-background) z-40"
         />
     </div>
     <Toolbar class="border-none rounded-none h-8 text-xs py-0">

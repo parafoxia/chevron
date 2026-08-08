@@ -41,26 +41,41 @@ const darkTheme = themeQuartz
     .withPart(colorSchemeDark)
     .withParams({ wrapperBorderRadius: 0 });
 
-const rowData = computed(() =>
-    props.table.toArray().map((row) => row.toJSON()),
-);
+const rowData = computed(() => [
+    ...props.table.toArray().map((row, i) => ({ __id__: i, ...row.toJSON() })),
+]);
 const columnDefs = computed(() => {
-    return props.table.schema.fields.map((f: FieldType) => ({
-        field: f.name,
-        headerName: f.name,
-        headerComponentParams: {
-            innerHeaderComponent: ColumnHeader,
-            innerHeaderComponentParams: {
-                arrowDType: f.type.toString(),
+    return [
+        {
+            field: "__id__",
+            headerName: "#",
+            valueGetter: "node.rowIndex + 1",
+            width: 100,
+            sortable: false,
+            filter: false,
+            pinned: true,
+        },
+        ...props.table.schema.fields.map((f: FieldType) => ({
+            field: f.name,
+            headerName: f.name,
+            headerComponentParams: {
+                innerHeaderComponent: ColumnHeader,
+                innerHeaderComponentParams: {
+                    arrowDType: f.type.toString(),
+                },
             },
-        },
-        valueFormatter: (params: ValueFormatterParams) => {
-            if (DataType.isDate(f.type) || DataType.isTimestamp(f.type)) {
-                return new Date(params.value).toISOString();
-            }
-            return params.value;
-        },
-    }));
+            valueFormatter: (params: ValueFormatterParams) => {
+                if (DataType.isDate(f.type) || DataType.isTimestamp(f.type)) {
+                    if (params.value == null) return "";
+                    const date = new Date(params.value);
+                    return Number.isNaN(date.getTime())
+                        ? ""
+                        : date.toISOString();
+                }
+                return params.value;
+            },
+        })),
+    ];
 });
 
 const onCellFocused = (e: CellFocusedEvent) => {
@@ -69,10 +84,6 @@ const onCellFocused = (e: CellFocusedEvent) => {
         "cellFocused",
         e.rowIndex == null || !col ? null : { row: e.rowIndex, col },
     );
-};
-
-const onFirstDataRendered = () => {
-    emit("firstDataRendered");
 };
 </script>
 
@@ -83,6 +94,6 @@ const onFirstDataRendered = () => {
         class="flex-1 min-h-0"
         :theme="darkTheme"
         @cell-focused="onCellFocused"
-        @first-data-rendered="onFirstDataRendered"
+        @first-data-rendered="emit('firstDataRendered')"
     />
 </template>
