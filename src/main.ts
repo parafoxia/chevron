@@ -7,7 +7,11 @@ import App from "./App.vue";
 import "./assets/css/global.css";
 import OpenVue from "openvue/config";
 import Aura from "@openvue/themes/aura";
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+
 import { router } from "./router";
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 
 const app = createApp(App);
 app.use(OpenVue, {
