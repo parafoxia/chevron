@@ -5,27 +5,55 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 -->
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, type Ref } from "vue";
 import { useRoute } from "vue-router";
 import { invoke } from "@tauri-apps/api/core";
 import { AgGridVue } from "ag-grid-vue3";
 import { colorSchemeDark, themeQuartz } from "ag-grid-community";
-import { tableFromIPC } from "apache-arrow";
+import { tableFromIPC, DataType } from "apache-arrow";
+import ColumnHeader from "./ColumnHeader.vue";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const route = useRoute();
 const path = route.query.path;
 
-const darkTheme = themeQuartz.withPart(colorSchemeDark);
+const darkTheme = themeQuartz
+    .withPart(colorSchemeDark)
+    .withParams({ wrapperBorderRadius: 0 });
 
 const rowData = ref<Record<string, any>[]>([]);
 const colDefs = ref<{ field: string }[]>([]);
 
+type FieldType = {
+    name: string;
+    type: DataType;
+    nullable: boolean;
+    metadata: Map<string, any>;
+};
+
 onMounted(async () => {
+    await getCurrentWindow().toggleMaximize();
+
     const table = tableFromIPC(
         await invoke<ArrayBuffer>("open_parquet", { path: path as string }),
     );
     rowData.value = table.toArray().map((row) => row.toJSON());
-    colDefs.value = table.schema.fields.map((field) => ({ field: field.name }));
+    colDefs.value = table.schema.fields.map((f: FieldType) => ({
+        field: f.name,
+        headerName: f.name,
+        headerComponentParams: {
+            innerHeaderComponent: ColumnHeader,
+            innerHeaderComponentParams: {
+                arrowDType: f.type.toString(),
+            },
+        },
+        valueFormatter: (params: Ref<any>) => {
+            if (DataType.isDate(f.type)) {
+                return new Date(params.value).toDateString();
+            }
+            return params.value;
+        },
+    }));
 });
 </script>
 
@@ -33,7 +61,7 @@ onMounted(async () => {
     <AgGridVue
         :rowData="rowData"
         :columnDefs="colDefs"
-        class="flex-1 min-h-0 rounded-none"
+        class="flex-1 min-h-0"
         :theme="darkTheme"
     />
 </template>

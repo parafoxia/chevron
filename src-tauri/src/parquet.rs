@@ -7,7 +7,6 @@ use std::fs::File;
 use tauri::ipc::Response as IpcResponse;
 
 pub struct ParquetFile {
-    pub path: String,
     frame: DataFrame,
 }
 
@@ -16,10 +15,7 @@ impl ParquetFile {
         let mut file = File::open(&path)?;
         let df = ParquetReader::new(&mut file).finish()?;
 
-        Ok(Self {
-            path: path,
-            frame: df,
-        })
+        Ok(Self { frame: df })
     }
 
     pub fn serialise(&self) -> PolarsResult<IpcResponse> {
