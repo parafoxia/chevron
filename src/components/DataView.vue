@@ -5,12 +5,10 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 -->
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch, shallowRef } from "vue";
 import { useRoute } from "vue-router";
 import { invoke } from "@tauri-apps/api/core";
-import { tableFromIPC, DataType } from "apache-arrow";
-import type { ColDef, ValueFormatterParams } from "ag-grid-community";
-import ColumnHeader from "./ColumnHeader.vue";
+import { tableFromIPC, type Table } from "apache-arrow";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import Toolbar from "openvue/toolbar";
 
@@ -20,18 +18,10 @@ import DataGrid, { type CellCoords } from "./DataGrid.vue";
 const route = useRoute();
 const path = computed(() => route.query.path as string);
 
-const rowData = ref<Record<string, any>[]>([]);
-const colDefs = ref<ColDef[]>([]);
+const table = shallowRef<Table<any> | null>(null);
 const height = ref(0);
 const width = ref(0);
 const selectedCell = ref<CellCoords | null>(null);
-
-type FieldType = {
-    name: string;
-    type: DataType;
-    nullable: boolean;
-    metadata: Map<string, any>;
-};
 
 let loadToken = 0;
 const isLoading = ref(false);
@@ -39,35 +29,17 @@ const isLoading = ref(false);
 const loadData = async () => {
     isLoading.value = true;
     const token = ++loadToken;
-    const table = tableFromIPC(
+    const loaded = tableFromIPC(
         await invoke<ArrayBuffer>("open_parquet", {
             path: path.value,
         }),
     );
-
     if (token !== loadToken) return;
+    table.value = loaded;
 
     selectedCell.value = null;
-    height.value = table.numCols;
-    width.value = table.numRows;
-    rowData.value = table.toArray().map((row) => row.toJSON());
-    colDefs.value = table.schema.fields.map((f: FieldType) => ({
-        field: f.name,
-        headerName: f.name,
-        headerComponentParams: {
-            innerHeaderComponent: ColumnHeader,
-            innerHeaderComponentParams: {
-                arrowDType: f.type.toString(),
-            },
-        },
-        valueFormatter: (params: ValueFormatterParams) => {
-            if (DataType.isDate(f.type) || DataType.isTimestamp(f.type)) {
-                return new Date(params.value).toISOString();
-            }
-            return params.value;
-        },
-    }));
-    isLoading.value = false;
+    height.value = table.value.numCols;
+    width.value = table.value.numRows;
 };
 
 watch(path, loadData, { immediate: true });
@@ -78,13 +50,18 @@ onMounted(async () => {
 </script>
 
 <template>
-    <DataLoading v-if="isLoading" />
-    <DataGrid
-        v-else
-        :rowData="rowData"
-        :colDefs="colDefs"
-        @cell-focused="selectedCell = $event"
-    />
+    <div class="relative flex flex-1 min-h-0">
+        <DataGrid
+            v-if="table"
+            :table="table"
+            @cell-focused="selectedCell = $event"
+            @first-data-rendered="isLoading = false"
+        />
+        <DataLoading
+            v-if="isLoading"
+            class="absolute inset-0 bg-(--p-content-background)"
+        />
+    </div>
     <Toolbar class="border-none rounded-none h-8 text-xs py-0">
         <template #end>
             <span v-if="selectedCell" class="mr-4">
