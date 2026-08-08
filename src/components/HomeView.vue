@@ -20,7 +20,7 @@ const onOpen = async () => {
 </script>
 
 <template>
-    <div class="flex min-h-screen flex-col items-center justify-center gap-4">
+    <div class="flex flex-1 flex-col items-center justify-center gap-4">
         <span class="text-3xl font-bold">Chevron</span>
         <span class="text-lg">What do you want to do?</span>
 

@@ -6,5 +6,5 @@ const path = route.query.path;
 </script>
 
 <template>
-    <div>{{ path }}</div>
+    <div class="flex-1">{{ path }}</div>
 </template>
