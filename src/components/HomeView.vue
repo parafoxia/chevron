@@ -3,19 +3,14 @@ import { useRouter } from "vue-router";
 
 import Card from "openvue/card";
 import { FilePlus, FolderOpen } from "@lucide/vue";
-import { open } from "@tauri-apps/plugin-dialog";
+
+import { selectFile } from "../lib/file";
 
 const router = useRouter();
 
 const onOpen = async () => {
-    const result = await open({
-        title: "Select a file",
-        filters: [{ name: "Parquet", extensions: ["parquet"] }],
-    });
-
-    if (result) {
-        router.push({ path: "/data", query: { path: result } });
-    }
+    const path = await selectFile();
+    if (path) router.push({ path: "/data", query: { path } });
 };
 </script>
 
@@ -39,7 +34,7 @@ const onOpen = async () => {
                         class="flex flex-col items-center gap-2 cursor-pointer"
                     >
                         <FolderOpen :size="48" />
-                        <span class="text-lg">Open</span>
+                        <span class="text-lg">Open...</span>
                     </div>
                 </template>
             </Card>

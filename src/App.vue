@@ -1,14 +1,44 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { exit } from "@tauri-apps/plugin-process";
 
 import Menubar from "openvue/menubar";
 import Dialog from "openvue/dialog";
 import Button from "openvue/button";
 import { ChevronsUp, X } from "@lucide/vue";
 
+import { selectFile } from "./lib/file";
+
+const router = useRouter();
 const showAboutDialog = ref(false);
 
+const onOpen = async () => {
+    const path = await selectFile();
+    if (path) router.push({ path: "/data", query: { path } });
+};
+
 const items = ref([
+    {
+        label: "File",
+        items: [
+            {
+                label: "New",
+                disabled: true,
+            },
+            {
+                label: "Open...",
+                command: onOpen,
+            },
+            { separator: true },
+            {
+                label: "Quit",
+                command: async () => {
+                    await exit(0);
+                },
+            },
+        ],
+    },
     {
         label: "Help",
         items: [
