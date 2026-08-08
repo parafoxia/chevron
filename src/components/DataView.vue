@@ -61,8 +61,8 @@ const loadData = async () => {
             },
         },
         valueFormatter: (params: ValueFormatterParams) => {
-            if (DataType.isDate(f.type)) {
-                return new Date(params.value).toDateString();
+            if (DataType.isDate(f.type) || DataType.isTimestamp(f.type)) {
+                return new Date(params.value).toISOString();
             }
             return params.value;
         },
