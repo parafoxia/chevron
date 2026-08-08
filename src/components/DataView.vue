@@ -5,7 +5,7 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 -->
 
 <script setup lang="ts">
-import { onMounted, ref, type Ref } from "vue";
+import { computed, onMounted, ref, type Ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import { invoke } from "@tauri-apps/api/core";
 import { AgGridVue } from "ag-grid-vue3";
@@ -15,7 +15,7 @@ import ColumnHeader from "./ColumnHeader.vue";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 const route = useRoute();
-const path = route.query.path;
+const path = computed(() => route.query.path as string);
 
 const darkTheme = themeQuartz
     .withPart(colorSchemeDark)
@@ -31,12 +31,17 @@ type FieldType = {
     metadata: Map<string, any>;
 };
 
-onMounted(async () => {
-    await getCurrentWindow().toggleMaximize();
+let loadToken = 0;
 
+const loadData = async () => {
+    const token = ++loadToken;
     const table = tableFromIPC(
-        await invoke<ArrayBuffer>("open_parquet", { path: path as string }),
+        await invoke<ArrayBuffer>("open_parquet", {
+            path: path.value,
+        }),
     );
+    if (token !== loadToken) return;
+
     rowData.value = table.toArray().map((row) => row.toJSON());
     colDefs.value = table.schema.fields.map((f: FieldType) => ({
         field: f.name,
@@ -54,6 +59,12 @@ onMounted(async () => {
             return params.value;
         },
     }));
+};
+
+watch(path, loadData, { immediate: true });
+
+onMounted(async () => {
+    await getCurrentWindow().maximize();
 });
 </script>
 
