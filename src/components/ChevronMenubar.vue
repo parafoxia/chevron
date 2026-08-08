@@ -26,15 +26,13 @@ const onOpen = async () => {
 
 const items = ref([
     {
-        label: "File",
+        label: "Chevron",
         items: [
             {
-                label: "New",
-                disabled: true,
-            },
-            {
-                label: "Open...",
-                command: onOpen,
+                label: "About Chevron",
+                command: () => {
+                    showAboutDialog.value = true;
+                },
             },
             { separator: true },
             {
@@ -46,13 +44,15 @@ const items = ref([
         ],
     },
     {
-        label: "Help",
+        label: "File",
         items: [
             {
-                label: "About Chevron",
-                command: () => {
-                    showAboutDialog.value = true;
-                },
+                label: "New",
+                disabled: true,
+            },
+            {
+                label: "Open...",
+                command: onOpen,
             },
         ],
     },
@@ -78,9 +78,14 @@ const items = ref([
             </Button>
         </template>
     </Dialog>
+
     <Menubar
         :model="items"
         breakpoint="100px"
         class="text-sm h-8 border-none rounded-none relative z-50"
-    />
+    >
+        <template #submenuicon="{ root }">
+            <ChevronRight v-if="!root" :size="14" />
+        </template>
+    </Menubar>
 </template>
