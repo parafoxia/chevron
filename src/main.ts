@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Ethan Henderson
+//
+// SPDX-License-Identifier: MIT OR Apache-2.0
+
 import { createApp } from "vue";
 import App from "./App.vue";
 import "./assets/css/global.css";
