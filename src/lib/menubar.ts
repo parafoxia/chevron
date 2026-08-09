@@ -9,6 +9,7 @@ import {
   PredefinedMenuItem,
   Submenu,
 } from "@tauri-apps/api/menu";
+import { Image } from "@tauri-apps/api/image";
 import { resolveResource } from "@tauri-apps/api/path";
 import { message } from "@tauri-apps/plugin-dialog";
 import { openPath } from "@tauri-apps/plugin-opener";
@@ -54,6 +55,7 @@ async function appSubmenu() {
             version,
             copyright: "Copyright © 2026 Ethan Henderson",
             license: "MIT OR Apache-2.0",
+            icon: await Image.fromPath("icons/128x128.png"),
           },
         },
       }),
