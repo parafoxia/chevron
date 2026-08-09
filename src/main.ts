@@ -10,6 +10,7 @@ import Aura from "@openvue/themes/aura";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 
 import { router } from "./router";
+import { initMenubar } from "./lib/menubar";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -27,3 +28,4 @@ app.use(OpenVue, {
 });
 app.use(router);
 app.mount("#app");
+initMenubar().catch((e) => console.error("failed to set app menu:", e));
