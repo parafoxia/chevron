@@ -9,6 +9,9 @@ import {
   PredefinedMenuItem,
   Submenu,
 } from "@tauri-apps/api/menu";
+import { resolveResource } from "@tauri-apps/api/path";
+import { message } from "@tauri-apps/plugin-dialog";
+import { openPath } from "@tauri-apps/plugin-opener";
 import { exit } from "@tauri-apps/plugin-process";
 
 import { router } from "../router";
@@ -21,6 +24,20 @@ const separator = () => PredefinedMenuItem.new({ item: "Separator" });
 const onOpen = async () => {
   const path = await selectFile();
   if (path) router.push({ path: "/data", query: { path } });
+};
+
+// The notice is generated at build time, so it is absent under `tauri dev`.
+// Surface any failure rather than leaving the menu item looking inert -- the
+// webview console is not visible in a bundled app.
+const onLicenses = async () => {
+  try {
+    await openPath(await resolveResource("THIRD-PARTY-LICENSES.txt"));
+  } catch (error) {
+    await message(`Could not open the third-party licences.\n\n${error}`, {
+      title: "Chevron",
+      kind: "error",
+    });
+  }
 };
 
 async function appSubmenu() {
@@ -39,6 +56,11 @@ async function appSubmenu() {
             license: "MIT OR Apache-2.0",
           },
         },
+      }),
+      await MenuItem.new({
+        id: "licenses",
+        text: "Third-Party Licenses",
+        action: onLicenses,
       }),
       await separator(),
       ...(isMac

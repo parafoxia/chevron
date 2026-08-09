@@ -12,9 +12,17 @@ path = [
   "src-tauri/.gitignore",
   "src-tauri/capabilities/default.json",
   "src-tauri/tauri.conf.json",
+  "attributions/manifest.json",
 ]
 SPDX-FileCopyrightText = "2026 Ethan Henderson"
 SPDX-License-Identifier = "MIT OR Apache-2.0"
+
+# Third-party licence texts for attributions that appear in neither lockfile.
+[[annotations]]
+path = ["attributions/OFL-1.1.txt"]
+precedence = "override"
+SPDX-FileCopyrightText = "2017 IBM Corp."
+SPDX-License-Identifier = "OFL-1.1"
 
 # Generated lockfiles.
 [[annotations]]

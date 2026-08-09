@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2026 Ethan Henderson
+
+SPDX-License-Identifier: MIT OR Apache-2.0
+-->
+
 <script setup lang="ts">
 defineProps<{
     params: { displayName: string; dtype: string; arrowDType: string };

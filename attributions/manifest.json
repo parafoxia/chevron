@@ -1,0 +1,16 @@
+{
+  "packages": [
+    {
+      "name": "IBM Plex Sans",
+      "version": null,
+      "spdx": "OFL-1.1",
+      "repository": "https://github.com/IBM/plex",
+      "textFile": "attributions/OFL-1.1.txt",
+      "notes": [
+        "Chevron's interface font. Loaded at runtime from Google Fonts by src/assets/css/global.css rather than bundled."
+      ]
+    }
+  ],
+  "_allowMissingText": "Packages known to ship without a licence file. Anything not listed here fails a strict (CI) run, so a new unattributable dependency cannot slip into a release. A trailing * matches a prefix.",
+  "allowMissingText": ["@rolldown/binding-*"]
+}
