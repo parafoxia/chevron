@@ -3,7 +3,13 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 import { getName, getVersion } from "@tauri-apps/api/app";
-import { Menu, MenuItem, PredefinedMenuItem, Submenu } from "@tauri-apps/api/menu";
+import {
+  Menu,
+  MenuItem,
+  PredefinedMenuItem,
+  Submenu,
+} from "@tauri-apps/api/menu";
+import { exit } from "@tauri-apps/plugin-process";
 
 import { router } from "../router";
 import { selectFile } from "./file";
@@ -43,7 +49,13 @@ async function appSubmenu() {
             await separator(),
           ]
         : []),
-      await PredefinedMenuItem.new({ text: `Quit ${name}`, item: "Quit" }),
+      // The predefined one seemingly doesn't work on Linux.
+      await MenuItem.new({
+        id: "quit",
+        text: `Quit ${name}`,
+        accelerator: "CmdOrCtrl+Q",
+        action: async () => await exit(0),
+      }),
     ],
   });
 }
