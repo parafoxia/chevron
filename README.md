@@ -1,33 +1,47 @@
 # Chevron
 
-A Parquet reader. Very much a WIP!
+A simple Parquet viewer and soon-to-be editor.
 
-## Building
+⚠️ Chevron is still very early in development, and so may contain bugs and incomplete features.
 
-Building Chevron requires [cargo-about](https://github.com/EmbarkStudios/cargo-about),
-which collects the licences of the Rust crates Chevron ships:
+## Installation
+
+Chevron is available as a standalone binary for Windows, macOS, and Linux. You can download it from the [releases page](https://github.com/parafoxia/chevron/releases).
+
+For the most part, these binaries are unsigned, so you'll need to jump though some hoops to get these running. If you'd rather not deal with that, scroll down to the _Building from source_ section.
+
+### Windows
+
+SmartScreen will try and get in your way, but that is really your only obstacle.
+
+### macOS
+You will need to allow Chevron to open via the Privacy & Security settings:
+
+1. Open the Setting app
+2. Open the Privacy & Security tab
+3. Scroll down to the Security section
+4. Click "Open anyway"
+
+### Linux
+Chevron supports NVIDIA + Wayland setups [with some workarounds](./src-tauri/src/main.rs#L17), and probably only because that's my setup! It's entirely possible the app won't render correctly on your setup -- if that's the case, open an issue.
+
+Only the AppImage has been tested. 
+
+## Building from source
+
+To build from source, you will need to install [NPM](https://www.npmjs.com/) and [Rust](https://rust-lang.org/). Once you have those, you can run the following commands:
 
 ```sh
-cargo install cargo-about
+git clone https://github.com/parafoxia/chevron
+cd chevron
+npm install
+npm run tauri build
 ```
 
-`npm run tauri build` then runs `npm run licenses` for you. `npm run tauri dev` does
-not, so cargo-about is only needed for release builds.
+This will build binaries (or setup executables) for your operating system.
+
+On Arch, you may need to run `NO_STRIP=1 npm run tauri build -- --bundles=appimage` instead.
 
 ## License
 
 Chevron is licensed under [MIT](LICENSES/MIT.txt) OR [Apache 2.0](LICENSES/Apache-2.0.txt), at your option.
-
-### Third-party licenses
-
-Chevron bundles third-party npm packages and Rust crates. `npm run licenses`
-generates `src-tauri/resources/THIRD-PARTY-LICENSES.txt` from `package-lock.json` and
-`Cargo.lock`, covering only what the build being made actually ships. That file is
-bundled with every release and can be opened from the app's menubar.
-
-The file is never committed — it is regenerated on every build so it cannot drift from
-the lockfiles. In CI the generator runs strictly, failing the build if a dependency
-introduces a licence that is not listed in [`src-tauri/about.toml`](src-tauri/about.toml),
-or ships without a licence text and is not allowlisted in
-[`attributions/manifest.json`](attributions/manifest.json). That file also carries
-attributions for anything in neither lockfile, such as the interface font.
