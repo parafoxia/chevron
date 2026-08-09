@@ -26,7 +26,8 @@
     "targets": "all",
     "license": "MIT OR Apache-2.0",
     "resources": {
-      "resources/THIRD-PARTY-LICENSES.txt": "THIRD-PARTY-LICENSES.txt"
+      "resources/THIRD-PARTY-LICENSES.txt": "THIRD-PARTY-LICENSES.txt",
+      "icons/128x128.png": "icon.png"
     },
     "icon": [
       "icons/32x32.png",

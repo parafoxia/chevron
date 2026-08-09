@@ -55,7 +55,7 @@ async function appSubmenu() {
             version,
             copyright: "Copyright © 2026 Ethan Henderson",
             license: "MIT OR Apache-2.0",
-            icon: await Image.fromPath("icons/128x128.png"),
+            icon: await Image.fromPath(await resolveResource("icon.png")),
           },
         },
       }),
