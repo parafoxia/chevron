@@ -8,16 +8,14 @@ SPDX-License-Identifier: MIT OR Apache-2.0
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { exit } from "@tauri-apps/plugin-process";
+import { message } from "@tauri-apps/plugin-dialog";
+import { invoke } from "@tauri-apps/api/core";
 
 import Menubar from "openvue/menubar";
-import Dialog from "openvue/dialog";
-import Button from "openvue/button";
-import { ChevronsUp, X } from "@lucide/vue";
 
 import { selectFile } from "../lib/file";
 
 const router = useRouter();
-const showAboutDialog = ref(false);
 
 const onOpen = async () => {
     const path = await selectFile();
@@ -30,8 +28,12 @@ const items = ref([
         items: [
             {
                 label: "About Chevron",
-                command: () => {
-                    showAboutDialog.value = true;
+                command: async () => {
+                    const version = await invoke<string>("get_version");
+                    await message(`Chevron ${version}`, {
+                        title: "About Chevron",
+                        kind: "info",
+                    });
                 },
             },
             { separator: true },
@@ -60,25 +62,6 @@ const items = ref([
 </script>
 
 <template>
-    <Dialog v-model:visible="showAboutDialog" modal class="min-w-70 min-h-70">
-        <template #header>
-            <span class="text-xl">About</span>
-        </template>
-        <template #default>
-            <div class="flex flex-1 flex-col justify-center items-center">
-                <ChevronsUp class="mb-4" :size="72" />
-                <span>Chevron Alpha</span>
-                <span>v0.1.0</span>
-            </div>
-        </template>
-        <template #footer>
-            <Button @click="showAboutDialog = false">
-                <X :size="18" />
-                <span>Close</span>
-            </Button>
-        </template>
-    </Dialog>
-
     <Menubar
         :model="items"
         breakpoint="100px"

@@ -7,6 +7,11 @@ use tauri::ipc::Response as IpcResponse;
 mod parquet;
 
 #[tauri::command]
+fn get_version() -> String {
+    env!("CARGO_PKG_VERSION").to_string()
+}
+
+#[tauri::command]
 fn open_parquet(path: String) -> IpcResponse {
     parquet::ParquetFile::open(path)
         .expect("Failed to open Parquet file")
@@ -20,7 +25,7 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![open_parquet])
+        .invoke_handler(tauri::generate_handler![get_version, open_parquet])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
