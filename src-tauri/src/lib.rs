@@ -24,11 +24,6 @@ fn access_file(files: &State<'_, Mutex<Files>>, path: &String) -> ParquetFile {
 }
 
 #[tauri::command]
-fn get_version() -> String {
-    env!("CARGO_PKG_VERSION").to_string()
-}
-
-#[tauri::command]
 fn read_table(files: State<'_, Mutex<Files>>, path: String) -> IpcResponse {
     access_file(&files, &path)
         .serialise_table()
@@ -45,7 +40,7 @@ pub fn run() {
         .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![get_version, read_table])
+        .invoke_handler(tauri::generate_handler![read_table])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

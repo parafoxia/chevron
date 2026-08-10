@@ -27,9 +27,6 @@ const onOpen = async () => {
   if (path) router.push({ path: "/data", query: { path } });
 };
 
-// The notice is generated at build time, so it is absent under `tauri dev`.
-// Surface any failure rather than leaving the menu item looking inert -- the
-// webview console is not visible in a bundled app.
 const onLicenses = async () => {
   try {
     await openPath(await resolveResource("THIRD-PARTY-LICENSES.txt"));
