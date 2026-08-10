@@ -3,24 +3,26 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use polars::prelude::*;
-use std::fs::File;
 use tauri::ipc::Response as IpcResponse;
 
 pub struct ParquetFile {
-    frame: DataFrame,
+    path: String,
 }
 
 impl ParquetFile {
     pub fn open(path: String) -> PolarsResult<Self> {
-        let mut file = File::open(&path)?;
-        let df = ParquetReader::new(&mut file).finish()?;
-
-        Ok(Self { frame: df })
+        Ok(Self { path })
     }
 
-    pub fn serialise(&self) -> PolarsResult<IpcResponse> {
+    pub fn scan(&self) -> PolarsResult<LazyFrame> {
+        LazyFrame::scan_parquet(PlRefPath::new(&self.path), Default::default())
+    }
+
+    pub fn serialise_table(&self) -> PolarsResult<IpcResponse> {
+        let mut df = self.scan()?.limit(1_000).collect()?;
+
         let mut buf = Vec::new();
-        IpcWriter::new(&mut buf).finish(&mut self.frame.clone())?;
+        IpcWriter::new(&mut buf).finish(&mut df)?;
 
         Ok(IpcResponse::new(buf))
     }

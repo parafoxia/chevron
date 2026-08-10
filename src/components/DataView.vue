@@ -23,8 +23,8 @@ const files = ref<string[]>([]);
 const table = shallowRef<Table<any> | null>(null);
 const loadedPath = ref("");
 
-const height = computed(() => table.value?.numCols ?? 0);
-const width = computed(() => table.value?.numRows ?? 0);
+const width = computed(() => table.value?.numCols ?? 0);
+const height = computed(() => table.value?.numRows ?? 0);
 const selectedCell = ref<CellCoords | null>(null);
 
 const loadData = async () => {
@@ -34,7 +34,7 @@ const loadData = async () => {
 
     const target = path.value;
     const loaded = tableFromIPC(
-        await invoke<ArrayBuffer>("open_parquet", { path: target }),
+        await invoke<ArrayBuffer>("read_table", { path: target }),
     );
     if (target !== path.value) return;
 
@@ -64,7 +64,7 @@ onMounted(async () => {
             <span v-if="selectedCell" class="mr-4">
                 {{ selectedCell.col }}:{{ selectedCell.row + 1 }}
             </span>
-            <span>({{ height }}, {{ width }})</span>
+            <span>({{ width }}, {{ height }})</span>
         </template>
     </Toolbar>
 </template>
