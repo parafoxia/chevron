@@ -5,21 +5,19 @@
 use polars::prelude::*;
 use tauri::ipc::Response as IpcResponse;
 
+#[derive(Clone)]
 pub struct ParquetFile {
-    path: String,
+    lf: LazyFrame,
 }
 
 impl ParquetFile {
-    pub fn open(path: String) -> PolarsResult<Self> {
-        Ok(Self { path })
-    }
-
-    pub fn scan(&self) -> PolarsResult<LazyFrame> {
-        LazyFrame::scan_parquet(PlRefPath::new(&self.path), Default::default())
+    pub fn open(path: &String) -> PolarsResult<Self> {
+        let lf = LazyFrame::scan_parquet(PlRefPath::new(path), Default::default())?;
+        Ok(Self { lf })
     }
 
     pub fn serialise_table(&self) -> PolarsResult<IpcResponse> {
-        let mut df = self.scan()?.limit(1_000).collect()?;
+        let mut df = self.lf.clone().limit(1_000).collect()?;
 
         let mut buf = Vec::new();
         IpcWriter::new(&mut buf).finish(&mut df)?;
